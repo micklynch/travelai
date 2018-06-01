@@ -1,0 +1,29 @@
+{
+  "name": "travelai",
+  "version": "1.0.0",
+  "description": "learning from travel",
+  "main": "main.js",
+  "dependencies": {
+    "brainjs": "^0.7.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/micklynch/travelai.git"
+  },
+  "keywords": [
+    "travel",
+    "brainjs",
+    "node",
+    "javascript"
+  ],
+  "author": "M. Lynch",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/micklynch/travelai/issues"
+  },
+  "homepage": "https://github.com/micklynch/travelai#readme"
+}
