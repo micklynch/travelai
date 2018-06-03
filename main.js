@@ -1,6 +1,7 @@
 
 const net = require("brainjs");
 const data = require("./data");
+const _ = require('lodash');
 
 var mymodel = new net.NeuralNetwork();
 
@@ -27,3 +28,18 @@ data.getTrainingData()
 var output = mymodel.run("peter"); // 
 
 console.log(output);
+
+// From https://thecodebarbarian.com/building-a-wine-tasting-neural-network-with-node-js.html
+// const net = new NeuralNetwork();
+// const numTrainingData = 1000;
+
+// const trainingData = data.
+//   slice(0, numTrainingData).
+//   map(obj => ({
+//     input: _.omit(obj, ['quality']),
+//     output: _.pick(obj, ['quality'])
+//   }));
+
+// console.log(trainingData[0]);
+
+// console.log('done training', net.train(trainingData));

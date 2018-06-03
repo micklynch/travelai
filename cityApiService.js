@@ -2,32 +2,30 @@ const https = require('https');
 const http = require('http');
 const _ = require('lodash');
 
-exports.getdata = async function (data)
-{
-    return new Promise(resolve => {
-        let res = splitCitiesAndCountries(data);
-        resolve(res);
-    });
-}
-
-
-function splitCitiesAndCountries(data){
-    //console.log(data);
-    let fulldata = data.forEach(entry => {
+exports.getdata =  (data) => {
+    
+     const pArray = data.map(async(entry) => {
         let splitcity = entry.Location.split(',');
         let city = splitcity[0].replace(/\s/g, ''); // regex to remove spaces
-        let country = splitcity [1].replace(/\s/g, '');
-        let fullentry = getCountryStats(country)
-        .then((countrystats) => {
-            return getCountryFinances(countrystats);
-        }).catch (err => console.err(err))        
+        let country = splitcity[1].replace(/\s/g, '');
+
+        const countrystats = await getCountryStats(country); 
+        const worldBankData = await getCountryFinances(countrystats.code);
+        const res = _.assign(countrystats, worldBankData); 
+        
+        return res;
+    })
+    Promise.all(pArray).then(completed => {
+        console.log(completed);
+        return completed;
     });
-    return fulldata;
 }
 
-function getCountryFinances(countrystats) {
+function getCountryFinances(countrycode) {
 
-    let url = 'http://api.worldbank.org/v2/countries/'+countrystats.code+'/indicators/NY.GDP.MKTP.CD?date=2015&format=JSON';
+    // e.g. http://api.worldbank.org/v2/countries/TH/indicators/NY.GDP.MKTP.CD?date=2015&format=JSON
+
+    let url = 'http://api.worldbank.org/v2/countries/'+countrycode+'/indicators/NY.GDP.MKTP.CD?date=2015&format=JSON';
     return new Promise(resolve => {
         http.get(url, (response) => {
             var body = '';
@@ -37,8 +35,7 @@ function getCountryFinances(countrystats) {
             });
             response.on('end', () => {
                 let worldBankData = getWorldBankData(body);
-                let fullresult = _.assign(countrystats, worldBankData);
-                resolve(fullresult);
+                resolve(worldBankData);
             })
             response.on('error', console.error)
         });
@@ -47,13 +44,12 @@ function getCountryFinances(countrystats) {
 
 function getWorldBankData(json) {
     let itemArray = JSON.parse(json)[1];
-    for (let i in itemArray) {
-        item = itemArray[i];
-        return { 'GDP': item.value };
-    }
+    item = itemArray[0];
+    return { 'GDP': item.value };
 }
 
 function getCountryStats(country) {
+
     let url = 'https://restcountries.eu/rest/v2/name/';
 
     return new Promise(resolve => {
