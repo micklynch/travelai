@@ -4,17 +4,15 @@ const cityApiService = require('./cityApiService');
 
 // import data from csv
 let getTrainingData = function() {
-    return importdatafromcsv.getdata()
+    return new Promise (resolve => {
+        importdatafromcsv.getdata()
         .then((datafromcsv) => {
-            return cityApiService.getdata(datafromcsv);
-        })
-        .then((dataFromApi) => {
-            //console.log(dataFromApi);
+            let res = cityApiService.getdata(datafromcsv);
+            resolve(res);
         })
         .catch(err => { console.log(err); }
         );
-
-        return dataFromApi;
+});
 }
 // add population from API service
 
@@ -23,5 +21,5 @@ let getTrainingData = function() {
 
 getTrainingData().then((data) =>
 {
-//console.log(data)
+    console.log(data)
 });
