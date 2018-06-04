@@ -2,33 +2,35 @@ const https = require('https');
 const http = require('http');
 const _ = require('lodash');
 
-exports.getdata =  (data) => {
-    
-     const pArray = data.map(async(entry) => {
+exports.getdata = async (data) => {    
+    const pArray = data.map(async(entry) => { // look at each row in the file
+        //split the city and country
         let splitcity = entry.Location.split(',');
         let city = splitcity[0].replace(/\s/g, ''); // regex to remove spaces
         let country = splitcity[1].replace(/\s/g, '');
-
+        //get the country code and population from RESTCountriesAPI
         const countrystats = await getCountryStats(country); 
+        // use the country code to get the GDP from World Bank
         const worldBankData = await getCountryFinances(countrystats.code);
-        const res = _.assign(countrystats, worldBankData); 
-        
+        // combine the country code and GDP
+        const res = _.assign(countrystats, worldBankData);        
+        // return promise to new array
         return res;
     })
-    Promise.all(pArray).then(completed => {
-        console.log(completed);
+    // await for the promise to be fulfilled 
+    return await Promise.all(pArray).then(completed => {
         return completed;
     });
 }
 
-function getCountryFinances(countrycode) {
+let getCountryFinances = countrycode => {
 
     // e.g. http://api.worldbank.org/v2/countries/TH/indicators/NY.GDP.MKTP.CD?date=2015&format=JSON
 
     let url = 'http://api.worldbank.org/v2/countries/'+countrycode+'/indicators/NY.GDP.MKTP.CD?date=2015&format=JSON';
     return new Promise(resolve => {
         http.get(url, (response) => {
-            var body = '';
+            let body = '';
             response.setEncoding('utf8')
             response.on('data', (d) => {
                 body += d;
@@ -42,19 +44,19 @@ function getCountryFinances(countrycode) {
     });
 }
 
-function getWorldBankData(json) {
+let getWorldBankData = json => {
     let itemArray = JSON.parse(json)[1];
     item = itemArray[0];
     return { 'GDP': item.value };
 }
 
-function getCountryStats(country) {
+let getCountryStats = country => {
 
     let url = 'https://restcountries.eu/rest/v2/name/';
 
     return new Promise(resolve => {
         https.get(url + country, (response) => {
-            var body = '';
+            let body = '';
             response.setEncoding('utf8')
             response.on('data', (d) => {
                 body += d;
@@ -62,6 +64,7 @@ function getCountryStats(country) {
             response.on('end', () => {
                 let result = JSON.parse(body);
                 if (result.status === 404) {
+                    console.err('Cannot get a response from the server for '+country)
                     return;
                 }
                 else {
@@ -75,3 +78,5 @@ function getCountryStats(country) {
         });
     });
 }
+
+exports.getCountryStats = getCountryStats;

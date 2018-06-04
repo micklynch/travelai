@@ -1,13 +1,20 @@
 const importdatafromcsv = require('./importdatafromcsv');
-const cityApiService = require('./cityApiService');
-
+const apiService = require('./apiService');
+const _ = require('lodash');
 
 // import data from csv
-let getTrainingData = async function() {
-    let csvdata = await importdatafromcsv.getdata();
-    //console.log(csvdata);
-    let res = await cityApiService.getdata(csvdata);
-    return res; 
-}
+exports.getTrainingData = async () => {
 
-getTrainingData();
+    // read original data
+    let csvdata = await importdatafromcsv.getdata();
+
+    // augment with data from APIs
+    let apidata = await apiService.getdata(csvdata);
+
+    //combine data
+    let result = _.merge(csvdata, apidata);
+
+    return await new Promise(resolve => {
+        resolve(result);
+    });
+}
