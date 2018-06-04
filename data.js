@@ -1,27 +1,20 @@
 const importdatafromcsv = require('./importdatafromcsv');
-const cityApiService = require('./cityApiService');
-
+const apiService = require('./apiService');
+const _ = require('lodash');
 
 // import data from csv
-let getTrainingData = function() {
-    return importdatafromcsv.getdata()
-        .then((datafromcsv) => {
-            return cityApiService.getdata(datafromcsv);
-        })
-        .then((dataFromApi) => {
-            //console.log(dataFromApi);
-        })
-        .catch(err => { console.log(err); }
-        );
+exports.getTrainingData = async () => {
 
-        return dataFromApi;
+    // read original data
+    let csvdata = await importdatafromcsv.getdata();
+
+    // augment with data from APIs
+    let apidata = await apiService.getdata(csvdata);
+
+    //combine data
+    let result = _.merge(csvdata, apidata);
+
+    return await new Promise(resolve => {
+        resolve(result);
+    });
 }
-// add population from API service
-
-
-// convert to brainjs format
-
-getTrainingData().then((data) =>
-{
-//console.log(data)
-});
