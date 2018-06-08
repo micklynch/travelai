@@ -23,7 +23,7 @@ data.getTrainingData().then((data) =>{
     // let's TRAIN!!
     console.log('done training', net.train(trainingData));
     // Test with Malaysia
-    var output = net.run({ 'COUNTA of City': '3', population: 31000000, GDP: 296000000000});
+    var output = net.run({ 'COUNTA of City': 10, population: 31000000, GDP: 296000000000});
     console.log(output);
 }).catch(err => {console.log(err)});
 
