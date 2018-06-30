@@ -64,7 +64,7 @@ let getCountryStats = country => {
             response.on('end', () => {
                 let result = JSON.parse(body);
                 if (result.status === 404) {
-                    console.err('Cannot get a response from the server for '+country)
+                    console.log('Cannot get a response from the server for '+country)
                     return;
                 }
                 else {
